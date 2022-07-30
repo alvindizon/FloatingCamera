@@ -1,0 +1,16 @@
+buildscript {
+    apply from: 'dependencies.gradle'
+    ext {
+        androidGradlePlugin = versions.androidGradlePlugin
+        kotlin = versions.kotlin
+    }
+}
+plugins {
+    id 'com.android.application' version "$androidGradlePlugin" apply false
+    id 'com.android.library' version "$androidGradlePlugin" apply false
+    id 'org.jetbrains.kotlin.android' version "$kotlin" apply false
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
