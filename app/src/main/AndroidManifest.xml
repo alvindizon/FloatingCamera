@@ -4,6 +4,7 @@
     package="com.alvindizon.floatingcamera">
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="false"
@@ -26,6 +27,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".features.floatingwidget.service.FloatingCameraService" />
+        <receiver android:name=".features.floatingwidget.receiver.StopFloatingCameraReceiver" />
     </application>
 
 </manifest>

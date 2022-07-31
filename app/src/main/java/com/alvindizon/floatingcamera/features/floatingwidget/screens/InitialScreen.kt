@@ -24,14 +24,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.alvindizon.floatingcamera.R
+import com.alvindizon.floatingcamera.features.floatingwidget.service.FloatingCameraService
 
 @Composable
 fun InitialScreen() {
     val context = LocalContext.current
 
     val showDialog = rememberSaveable { mutableStateOf(false) }
-    val isPermissionGranted = rememberSaveable { mutableStateOf(false) }
 
     if (showDialog.value) {
         PermissionDialog(
@@ -51,9 +52,12 @@ fun InitialScreen() {
         .fillMaxSize()
         .padding(8.dp)) {
         InitialScreenContent(modifier = Modifier.align(Alignment.Center)) {
-            isPermissionGranted.value = Settings.canDrawOverlays(context)
             // show dialog if app can't draw over other apps
-            showDialog.value = !isPermissionGranted.value
+            showDialog.value = !Settings.canDrawOverlays(context)
+            if (!showDialog.value) {
+                val intent = Intent(context.applicationContext, FloatingCameraService::class.java)
+                ContextCompat.startForegroundService(context, intent)
+            }
         }
     }
 
