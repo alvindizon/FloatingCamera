@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import android.view.WindowManager
 import androidx.core.app.NotificationCompat
 import com.alvindizon.floatingcamera.R
 import com.alvindizon.floatingcamera.features.floatingwidget.receiver.StopFloatingCameraReceiver
@@ -17,10 +16,6 @@ import com.alvindizon.floatingcamera.features.floatingwidget.screens.FloatingCam
 
 
 class FloatingCameraService : Service() {
-
-    private val windowManager: WindowManager by lazy {
-        getSystemService(Context.WINDOW_SERVICE) as WindowManager
-    }
 
     private val notificationManager: NotificationManager by lazy {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -35,7 +30,7 @@ class FloatingCameraService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.getStringExtra(SVC_COMMAND_KEY) == SVC_COMMAND_EXIT) {
-            windowManager.removeViewImmediate(floatingCamera.view)
+            floatingCamera.removeView()
             notificationManager.cancel(FLOATING_CAMERA_NOTIF_ID)
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
@@ -51,7 +46,7 @@ class FloatingCameraService : Service() {
 
     private fun showFloatingCamera() {
         floatingCamera = FloatingCamera(this)
-        windowManager.addView(floatingCamera.view, floatingCamera.params)
+        floatingCamera.initializeView()
     }
 
     private fun createNotification(): Notification {
