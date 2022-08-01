@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import com.alvindizon.floatingcamera.R
 import com.alvindizon.floatingcamera.features.floatingwidget.receiver.StopFloatingCameraReceiver
 import com.alvindizon.floatingcamera.features.floatingwidget.screens.FloatingCamera
+import org.koin.android.ext.android.inject
 
 
 class FloatingCameraService : Service() {
@@ -21,7 +22,7 @@ class FloatingCameraService : Service() {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
-    private lateinit var floatingCamera: FloatingCamera
+    private val floatingCamera: FloatingCamera by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -45,7 +46,6 @@ class FloatingCameraService : Service() {
     override fun onBind(p0: Intent?): IBinder? = null
 
     private fun showFloatingCamera() {
-        floatingCamera = FloatingCamera(this)
         floatingCamera.initializeView()
     }
 
