@@ -9,5 +9,5 @@ import org.koin.dsl.module
 
 val factoryModule = module {
     factory<ScreenshotRepository> { ScreenshotRepositoryImpl(get(), get()) }
-    factory<ScreenshotManager> { ScreenshotManagerImpl(androidContext()) }
+    factory<ScreenshotManager> { ScreenshotManagerImpl(androidContext(), get(), get()) }
 }

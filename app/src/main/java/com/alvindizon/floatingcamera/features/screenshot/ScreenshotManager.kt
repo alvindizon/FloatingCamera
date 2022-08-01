@@ -24,7 +24,11 @@ interface ScreenshotManager {
 /**
  * Uses MediaProjection API to capture the screen.
  */
-class ScreenshotManagerImpl(private val context: Context) : ScreenshotManager {
+class ScreenshotManagerImpl(
+    private val context: Context,
+    private val mediaProjectionManager: MediaProjectionManager,
+    private val windowManager: WindowManager
+) : ScreenshotManager {
 
     private var screenDensity = 0
     private var windowWidth = 0
@@ -38,21 +42,10 @@ class ScreenshotManagerImpl(private val context: Context) : ScreenshotManager {
 
     private var mediaProjection: MediaProjection? = null
 
-    private val mediaProjectionManager: MediaProjectionManager by lazy {
-        context.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-    }
-
-    private val windowManager: WindowManager by lazy {
-        context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-    }
-
     override fun initialize(mediaData: Intent) {
         this.mediaData = mediaData
         mediaProjection = mediaProjectionManager.getMediaProjection(Activity.RESULT_OK, mediaData)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            val displayContext = with(context) {
-//                display?.let { createDisplayContext(it) }
-//            }
             val displayContext =
                 DisplayManagerCompat.getInstance(context).getDisplay(Display.DEFAULT_DISPLAY)?.let {
                     context.createDisplayContext(it)
@@ -70,7 +63,6 @@ class ScreenshotManagerImpl(private val context: Context) : ScreenshotManager {
             windowHeight = metrics.heightPixels
             windowWidth = metrics.widthPixels
             screenDensity = metrics.densityDpi
-
         }
 
         imageReader = ImageReader.newInstance(windowWidth, windowHeight, 0x1, 1)
