@@ -24,12 +24,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import com.alvindizon.floatingcamera.R
-import com.alvindizon.floatingcamera.features.floatingwidget.service.FloatingCameraService
 
 @Composable
-fun InitialScreen() {
+fun InitialScreen(onOverlayPermissionGranted: () -> Unit) {
     val context = LocalContext.current
 
     val showDialog = rememberSaveable { mutableStateOf(false) }
@@ -48,15 +46,17 @@ fun InitialScreen() {
         )
     }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(8.dp)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
         InitialScreenContent(modifier = Modifier.align(Alignment.Center)) {
             // show dialog if app can't draw over other apps
             showDialog.value = !Settings.canDrawOverlays(context)
             if (!showDialog.value) {
-                val intent = Intent(context.applicationContext, FloatingCameraService::class.java)
-                ContextCompat.startForegroundService(context, intent)
+                // invoke callback so that activity can ask for screen capture permission
+                onOverlayPermissionGranted()
             }
         }
     }

@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">FloatingCamera</string>
-    <string name="initial_screen_content_title">Launch the floating screenshot button. You may need to grant this app permission to display over other apps.</string>
+    <string name="initial_screen_content_title">Launch the floating screenshot button. You may need to grant this app permission to display over other apps and to take screenshots.</string>
     <string name="initial_screen_content_button_msg">Launch</string>
     <string name="initial_screen_dialog_title">Overlay permissions needed</string>
     <string name="initial_screen_permission_msg">This app requires permissions to display over other apps. Click on the OK button to go to settings and grant this permission</string>
     <string name="initial_screen_button_label">Go to settings</string>
     <string name="remove_camera">Remove floating camera</string>
+    <string name="screen_capture_not_granted_msg">This app needs screen capture permissions</string>
 </resources>
