@@ -9,7 +9,13 @@ import java.io.FileOutputStream
 /**
  * Class for saving bitmaps and for storing their filenames.
  */
-class BitmapFilenameCache(context: Context) {
+interface BitmapFilenameCache {
+    fun getLatestScreenshotFilename(): String
+    fun saveBitmap(bitmap: Bitmap)
+    fun clearCache()
+}
+
+class BitmapFilenameCacheImpl(context: Context) : BitmapFilenameCache {
 
     private val cacheDirPath: String by lazy {
         getBitmapCachePath(context)
@@ -17,9 +23,9 @@ class BitmapFilenameCache(context: Context) {
 
     private val fileNameList = mutableListOf<String>()
 
-    fun getLatestScreenshotFilename() = fileNameList[fileNameList.size - 1]
+    override fun getLatestScreenshotFilename() = fileNameList[fileNameList.size - 1]
 
-    fun saveBitmap(bitmap: Bitmap) {
+    override fun saveBitmap(bitmap: Bitmap) {
         try {
             val key = System.currentTimeMillis().toString(16)
             val fileFolder = File(cacheDirPath)
@@ -36,7 +42,7 @@ class BitmapFilenameCache(context: Context) {
         }
     }
 
-    fun clearCache() {
+    override fun clearCache() {
         fileNameList.forEach {
             val file = File(it)
             file.deleteRecursively()
