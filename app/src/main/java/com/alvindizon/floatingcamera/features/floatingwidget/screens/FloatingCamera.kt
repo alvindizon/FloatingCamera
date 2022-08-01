@@ -34,7 +34,7 @@ class FloatingCamera(context: Context) {
     private val windowManager: WindowManager by lazy {
         context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     }
-    
+
     private val view = ComposeView(context)
 
     private val layoutFlag: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -53,14 +53,17 @@ class FloatingCamera(context: Context) {
         PixelFormat.TRANSLUCENT
     )
 
-    fun initializeView() {
+    fun initializeView(onClick: () -> Unit) {
         view.setContent {
-            FloatingCamera { x, y ->
-                // we need to send updates to UI as we drag the icon
-                params.x += x.roundToInt()
-                params.y += y.roundToInt()
-                windowManager.updateViewLayout(view, params)
-            }
+            FloatingCamera(
+                onDrag = { x, y ->
+                    // we need to send updates to UI as we drag the icon
+                    params.x += x.roundToInt()
+                    params.y += y.roundToInt()
+                    windowManager.updateViewLayout(view, params)
+                },
+                onClick = onClick
+            )
         }
 
         // provide a fake lifecycleowner so we can use composables
@@ -78,12 +81,11 @@ class FloatingCamera(context: Context) {
     fun removeView() {
         windowManager.removeView(view)
     }
-
 }
 
 
 @Composable
-fun FloatingCamera(onDrag: (Float, Float) -> Unit) {
+fun FloatingCamera(onDrag: (Float, Float) -> Unit, onClick: () -> Unit) {
     // ref: https://developer.android.com/jetpack/compose/gestures#dragging
     IconButton(
         modifier = Modifier
@@ -93,7 +95,8 @@ fun FloatingCamera(onDrag: (Float, Float) -> Unit) {
                     onDrag(dragAmount.x, dragAmount.y)
                 })
             },
-        onClick = {}) {
+        onClick = onClick
+    ) {
         Icon(
             imageVector = Icons.Outlined.PhotoCamera,
             modifier = Modifier.size(48.dp),
@@ -112,7 +115,6 @@ internal class FloatingCameraLifeycleOwner : SavedStateRegistryOwner {
     override fun getLifecycle(): Lifecycle {
         return mLifecycleRegistry
     }
-
 
     fun handleLifecycleEvent(event: Lifecycle.Event) {
         mLifecycleRegistry.handleLifecycleEvent(event)

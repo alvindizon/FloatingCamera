@@ -13,6 +13,9 @@ import androidx.core.app.NotificationCompat
 import com.alvindizon.floatingcamera.R
 import com.alvindizon.floatingcamera.features.floatingwidget.receiver.StopFloatingCameraReceiver
 import com.alvindizon.floatingcamera.features.floatingwidget.screens.FloatingCamera
+import com.alvindizon.floatingcamera.features.screenshot.ScreenshotActivity
+import com.alvindizon.floatingcamera.features.screenshot.repo.ScreenshotRepository
+import com.alvindizon.floatingcamera.utils.getSafeParcelable
 import org.koin.android.ext.android.inject
 
 
@@ -24,8 +27,13 @@ class FloatingCameraService : Service() {
 
     private val floatingCamera: FloatingCamera by inject()
 
+    private val screenshotRepository: ScreenshotRepository by inject()
+
     override fun onCreate() {
         super.onCreate()
+        val notification = createNotification()
+        startForeground(FLOATING_CAMERA_NOTIF_ID, notification)
+        notificationManager.notify(FLOATING_CAMERA_NOTIF_ID, notification)
         showFloatingCamera()
     }
 
@@ -37,16 +45,31 @@ class FloatingCameraService : Service() {
             stopSelf()
             return START_NOT_STICKY
         }
-        val notification = createNotification()
-        startForeground(FLOATING_CAMERA_NOTIF_ID, notification)
-        notificationManager.notify(FLOATING_CAMERA_NOTIF_ID, notification)
+
+        if (intent?.hasExtra(MEDIA_DATA_KEY) == true) {
+            // create media projection in screenshot manager thru repo
+            val mediaData = intent.getSafeParcelable<Intent>(MEDIA_DATA_KEY)!!
+            screenshotRepository.initialize(mediaData)
+        }
+
         return START_STICKY
     }
 
     override fun onBind(p0: Intent?): IBinder? = null
 
+    override fun onDestroy() {
+        screenshotRepository.release()
+        super.onDestroy()
+    }
+
     private fun showFloatingCamera() {
-        floatingCamera.initializeView()
+        floatingCamera.initializeView {
+            val bitmap = screenshotRepository.capture()
+            bitmap?.let { screenshotRepository.saveBitmap(it) }
+            val intent = Intent(this, ScreenshotActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
+        }
     }
 
     private fun createNotification(): Notification {
@@ -85,6 +108,7 @@ class FloatingCameraService : Service() {
         private const val FLOATING_CAMERA_CHANNEL_DESC = "Channel for floating camera"
         const val SVC_COMMAND_KEY = "command-key"
         const val SVC_COMMAND_EXIT = "exit"
+        const val MEDIA_DATA_KEY = "mediaData-key"
     }
 }
 

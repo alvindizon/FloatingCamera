@@ -18,6 +18,9 @@ class MainActivity : ComponentActivity() {
     private val startMediaProjection = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == Activity.RESULT_OK) {
             val intent = Intent(applicationContext, FloatingCameraService::class.java)
+            // send the resulting intent to screenshotmanager by way of FloatingCameraService
+            // so that mediaprojection can be initialized
+            intent.putExtra(FloatingCameraService.MEDIA_DATA_KEY, it.data)
             ContextCompat.startForegroundService(this, intent)
         } else {
             Toast.makeText(this, getString(R.string.screen_capture_not_granted_msg), Toast.LENGTH_SHORT).show()

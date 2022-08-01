@@ -29,7 +29,15 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".features.floatingwidget.service.FloatingCameraService" />
+        <activity
+            android:name=".features.screenshot.ScreenshotActivity"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.FloatingCamera"/>
+
+        <service android:name=".features.floatingwidget.service.FloatingCameraService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
         <receiver android:name=".features.floatingwidget.receiver.StopFloatingCameraReceiver" />
     </application>
 
