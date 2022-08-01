@@ -22,7 +22,9 @@ class ScreenshotActivity : ComponentActivity() {
             FloatingCameraTheme {
                 ScreenshotContent(
                     cacheFile = cacheFile,
-                    onShareButtonClick = {}, onEmailButtonClick = {}
+                    onShareButtonClick = {},
+                    onEmailButtonClick = {},
+                    onCloseButtonClick = { finish() }
                 )
             }
         }
