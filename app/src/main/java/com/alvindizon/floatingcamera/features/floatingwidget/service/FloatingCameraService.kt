@@ -12,9 +12,9 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.alvindizon.floatingcamera.R
 import com.alvindizon.floatingcamera.features.floatingwidget.receiver.StopFloatingCameraReceiver
-import com.alvindizon.floatingcamera.features.floatingwidget.screens.FloatingCamera
-import com.alvindizon.floatingcamera.features.screenshot.ScreenshotActivity
+import com.alvindizon.floatingcamera.features.floatingwidget.ui.FloatingCamera
 import com.alvindizon.floatingcamera.features.screenshot.repo.ScreenshotRepository
+import com.alvindizon.floatingcamera.features.screenshot.ui.ScreenshotActivity
 import com.alvindizon.floatingcamera.utils.getSafeParcelable
 import org.koin.android.ext.android.inject
 

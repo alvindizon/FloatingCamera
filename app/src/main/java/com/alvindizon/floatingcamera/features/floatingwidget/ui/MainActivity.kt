@@ -1,4 +1,4 @@
-package com.alvindizon.floatingcamera
+package com.alvindizon.floatingcamera.features.floatingwidget.ui
 
 import android.app.Activity
 import android.content.Intent
@@ -9,7 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import com.alvindizon.floatingcamera.features.floatingwidget.screens.InitialScreen
+import com.alvindizon.floatingcamera.R
 import com.alvindizon.floatingcamera.features.floatingwidget.service.FloatingCameraService
 import com.alvindizon.floatingcamera.ui.theme.FloatingCameraTheme
 

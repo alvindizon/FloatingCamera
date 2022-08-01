@@ -1,4 +1,4 @@
-package com.alvindizon.floatingcamera.features.screenshot
+package com.alvindizon.floatingcamera.features.screenshot.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

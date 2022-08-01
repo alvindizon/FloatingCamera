@@ -1,4 +1,4 @@
-package com.alvindizon.floatingcamera.features.floatingwidget.screens
+package com.alvindizon.floatingcamera.features.floatingwidget.ui
 
 import android.content.Intent
 import android.net.Uri
