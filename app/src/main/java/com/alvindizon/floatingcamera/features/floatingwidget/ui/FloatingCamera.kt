@@ -6,9 +6,8 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.size
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.runtime.Composable
@@ -16,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModelStore
@@ -87,21 +85,22 @@ class FloatingCamera(context: Context) {
 @Composable
 fun FloatingCamera(onDrag: (Float, Float) -> Unit, onClick: () -> Unit) {
     // ref: https://developer.android.com/jetpack/compose/gestures#dragging
-    IconButton(
+    FloatingActionButton(
+        onClick = onClick,
         modifier = Modifier
             .pointerInput(Unit) {
-                detectDragGestures(onDrag = { change, dragAmount ->
-                    change.consume()
-                    onDrag(dragAmount.x, dragAmount.y)
-                })
-            },
-        onClick = onClick
+                detectDragGestures(
+                    onDrag = { change, dragAmount ->
+                        change.consume()
+                        onDrag(dragAmount.x, dragAmount.y)
+                    }
+                )
+            }
     ) {
         Icon(
             imageVector = Icons.Outlined.PhotoCamera,
-            modifier = Modifier.size(48.dp),
             contentDescription = null,
-            tint = Color.DarkGray
+            tint = Color.White
         )
     }
 }
