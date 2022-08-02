@@ -10,8 +10,14 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import org.junit.jupiter.api.Assertions.*
-
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -25,7 +31,13 @@ class ScreenshotRepositoryImplTest {
 
     @BeforeEach
     fun setUp() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
         repo = ScreenshotRepositoryImpl(bitmapFilenameCache, screenshotManager)
+    }
+
+    @AfterEach
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -43,7 +55,7 @@ class ScreenshotRepositoryImplTest {
     }
 
     @Test
-    fun `verify bitmapcache receives bitmap when saveBitmap is called`() {
+    fun `verify bitmapcache receives bitmap when saveBitmap is called`() = runTest {
         val captureBitmap = slot<Bitmap>()
         val bitmap: Bitmap = mockk {
             every { width } returns 100
