@@ -10,7 +10,7 @@ import java.io.FileOutputStream
  * Class for saving bitmaps and for storing their filenames.
  */
 interface BitmapFilenameCache {
-    fun getLatestScreenshotFilename(): String
+    fun getLatestScreenshotFilename(): String?
     fun saveBitmap(bitmap: Bitmap)
     fun clearCache()
 }
@@ -23,7 +23,7 @@ class BitmapFilenameCacheImpl(context: Context) : BitmapFilenameCache {
 
     private val fileNameList = mutableListOf<String>()
 
-    override fun getLatestScreenshotFilename() = fileNameList[fileNameList.size - 1]
+    override fun getLatestScreenshotFilename() = fileNameList.getOrNull(fileNameList.size - 1)
 
     override fun saveBitmap(bitmap: Bitmap) {
         try {

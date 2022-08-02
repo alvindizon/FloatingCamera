@@ -7,4 +7,5 @@
     <string name="initial_screen_button_label">Go to settings</string>
     <string name="remove_camera">Remove floating camera</string>
     <string name="screen_capture_not_granted_msg">This app needs screen capture permissions</string>
+    <string name="screenshot_error_msg">Sorry, we encountered a problem rendering the screenshot. Please try again.</string>
 </resources>

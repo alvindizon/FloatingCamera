@@ -8,8 +8,8 @@ import com.alvindizon.floatingcamera.features.screenshot.ScreenshotManager
 interface ScreenshotRepository {
     fun initialize(mediaData: Intent)
     fun capture(): Bitmap?
-    fun getLatestScreenshotFilename(): String
     suspend fun saveBitmap(bitmap: Bitmap)
+    fun getLatestScreenshotFilename(): String?
     fun release()
 }
 
@@ -29,7 +29,7 @@ class ScreenshotRepositoryImpl(
 
     override suspend fun saveBitmap(bitmap: Bitmap) { bitmapFilenameCache.saveBitmap(bitmap) }
 
-    override fun getLatestScreenshotFilename(): String {
+    override fun getLatestScreenshotFilename(): String? {
         return bitmapFilenameCache.getLatestScreenshotFilename()
     }
 
