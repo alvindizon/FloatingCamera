@@ -11,7 +11,7 @@ import org.koin.dsl.module
 
 val singleModule = module {
     single { FloatingCamera(androidContext()) }
-    single<BitmapFilenameCache> { BitmapFilenameCacheImpl(androidContext()) }
+    single<BitmapFilenameCache> { BitmapFilenameCacheImpl() }
     single { androidContext().getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager }
     single { androidContext().getSystemService(Context.WINDOW_SERVICE) as WindowManager }
 }

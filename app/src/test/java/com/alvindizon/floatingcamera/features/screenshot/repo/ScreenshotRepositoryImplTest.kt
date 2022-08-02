@@ -3,8 +3,11 @@ package com.alvindizon.floatingcamera.features.screenshot.repo
 import android.content.Intent
 import android.graphics.Bitmap
 import com.alvindizon.floatingcamera.data.cache.BitmapFilenameCache
+import com.alvindizon.floatingcamera.data.file.BitmapFileSaver
 import com.alvindizon.floatingcamera.features.screenshot.ScreenshotManager
 import io.mockk.Runs
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -27,12 +30,14 @@ class ScreenshotRepositoryImplTest {
 
     private val screenshotManager: ScreenshotManager = mockk()
 
+    private val bitmapFileSaver: BitmapFileSaver = mockk()
+
     private lateinit var repo: ScreenshotRepositoryImpl
 
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        repo = ScreenshotRepositoryImpl(bitmapFilenameCache, screenshotManager)
+        repo = ScreenshotRepositoryImpl(bitmapFilenameCache, screenshotManager, bitmapFileSaver)
     }
 
     @AfterEach
@@ -55,17 +60,22 @@ class ScreenshotRepositoryImplTest {
     }
 
     @Test
-    fun `verify bitmapcache receives bitmap when saveBitmap is called`() = runTest {
+    fun `verify bitmapFileSaver receives bitmap when saveBitmap is called`() = runTest {
         val captureBitmap = slot<Bitmap>()
+        val captureFilename = slot<String>()
         val bitmap: Bitmap = mockk {
             every { width } returns 100
         }
-        every { bitmapFilenameCache.saveBitmap(capture(captureBitmap)) } just Runs
+        val expectedFilename = "filename"
+        coEvery { bitmapFileSaver.saveBitmap(capture(captureBitmap)) } returns expectedFilename
+        coEvery { bitmapFilenameCache.saveFilename(capture(captureFilename)) } just Runs
 
         repo.saveBitmap(bitmap)
 
-        verify(exactly = 1) { bitmapFilenameCache.saveBitmap(any()) }
+        coVerify(exactly = 1) { bitmapFileSaver.saveBitmap(any()) }
+        coVerify(exactly = 1) { bitmapFilenameCache.saveFilename(any()) }
         assertEquals(100, captureBitmap.captured.width)
+        assertEquals(expectedFilename, captureFilename.captured)
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.alvindizon.floatingcamera.features.screenshot.repo
 import android.content.Intent
 import android.graphics.Bitmap
 import com.alvindizon.floatingcamera.data.cache.BitmapFilenameCache
+import com.alvindizon.floatingcamera.data.file.BitmapFileSaver
 import com.alvindizon.floatingcamera.features.screenshot.ScreenshotManager
 
 interface ScreenshotRepository {
@@ -18,7 +19,8 @@ interface ScreenshotRepository {
  */
 class ScreenshotRepositoryImpl(
     private val bitmapFilenameCache: BitmapFilenameCache,
-    private val screenshotManager: ScreenshotManager
+    private val screenshotManager: ScreenshotManager,
+    private val bitmapFileSaver: BitmapFileSaver
 ) : ScreenshotRepository {
 
     override fun initialize(mediaData: Intent) {
@@ -27,7 +29,10 @@ class ScreenshotRepositoryImpl(
 
     override fun capture(): Bitmap? = screenshotManager.capture()
 
-    override suspend fun saveBitmap(bitmap: Bitmap) { bitmapFilenameCache.saveBitmap(bitmap) }
+    override suspend fun saveBitmap(bitmap: Bitmap) {
+        val filename = bitmapFileSaver.saveBitmap(bitmap)
+        bitmapFilenameCache.saveFilename(filename)
+    }
 
     override fun getLatestScreenshotFilename(): String? {
         return bitmapFilenameCache.getLatestScreenshotFilename()
