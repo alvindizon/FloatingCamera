@@ -27,7 +27,7 @@ class BitmapFilenameCacheImpl(context: Context) : BitmapFilenameCache {
 
     override fun saveBitmap(bitmap: Bitmap) {
         try {
-            val key = System.currentTimeMillis().toString(16)
+            val key = System.currentTimeMillis().toString(16) + ".bmp"
             val fileFolder = File(cacheDirPath)
             if (!fileFolder.exists()) fileFolder.mkdirs()
             val file = File(cacheDirPath, key)

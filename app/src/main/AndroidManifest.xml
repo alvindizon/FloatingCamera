@@ -39,6 +39,16 @@
             android:exported="false"
             android:foregroundServiceType="mediaProjection" />
         <receiver android:name=".features.floatingwidget.receiver.StopFloatingCameraReceiver" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.alvindizon.floatingcamera.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
     </application>
 
 </manifest>

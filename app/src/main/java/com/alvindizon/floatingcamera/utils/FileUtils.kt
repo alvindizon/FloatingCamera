@@ -5,3 +5,7 @@ import java.io.File
 
 fun getBitmapCachePath(context: Context): String =
     context.cacheDir.path + File.separator + "bmp"
+
+
+fun getFileProviderAuthority(context: Context): String =
+    context.packageName + ".fileprovider"
