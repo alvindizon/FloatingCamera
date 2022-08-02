@@ -45,6 +45,7 @@ buildscript {
             'uiTooling': "androidx.compose.ui:ui-tooling:${versions.compose}",
         ],
         'coroutines': [
+            'core': "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}",
             'android': "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}",
             'test': "org.jetbrains.kotlinx:kotlinx-coroutines-test:${versions.coroutines}",
         ],

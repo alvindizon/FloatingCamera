@@ -16,6 +16,8 @@ import com.alvindizon.floatingcamera.features.floatingwidget.ui.FloatingCamera
 import com.alvindizon.floatingcamera.features.screenshot.repo.ScreenshotRepository
 import com.alvindizon.floatingcamera.features.screenshot.ui.ScreenshotActivity
 import com.alvindizon.floatingcamera.utils.getSafeParcelable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
 
 
@@ -63,13 +65,17 @@ class FloatingCameraService : Service() {
     }
 
     private fun showFloatingCamera() {
-        floatingCamera.initializeView {
-            val bitmap = screenshotRepository.capture()
+        floatingCamera.initializeView (onClick = { capture() })
+    }
+
+    private fun capture() {
+        val bitmap = screenshotRepository.capture()
+        runBlocking(Dispatchers.IO) {
             bitmap?.let { screenshotRepository.saveBitmap(it) }
-            val intent = Intent(this, ScreenshotActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            startActivity(intent)
         }
+        val intent = Intent(this, ScreenshotActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
     }
 
     private fun createNotification(): Notification {

@@ -80,6 +80,7 @@ dependencies {
     debugImplementation deps.compose.uiTooling
 
     implementation deps.coroutines.android
+    implementation deps.coroutines.core
     testImplementation deps.coroutines.test
 
     testImplementation deps.junit
