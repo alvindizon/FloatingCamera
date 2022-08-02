@@ -28,7 +28,7 @@ class ScreenshotActivity : ComponentActivity() {
                 ScreenshotContent(
                     cacheFile = cacheFile,
                     onShareButtonClick = { share() },
-                    onEmailButtonClick = {},
+                    onEmailButtonClick = { email() },
                     onCloseButtonClick = { finish() }
                 )
             }
@@ -49,6 +49,18 @@ class ScreenshotActivity : ComponentActivity() {
                 putExtra(Intent.EXTRA_STREAM, uri)
             }
             startActivity(Intent.createChooser(shareIntent, getString(R.string.app_name)))
+        }
+    }
+
+    private fun email() {
+        cacheFile?.let {
+            val attachment = FileProvider.getUriForFile(this, getFileProviderAuthority(this), it)
+            val emailIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.send_email_msg))
+                putExtra(Intent.EXTRA_STREAM, attachment)
+            }
+            startActivity(Intent.createChooser(emailIntent, getString(R.string.send_email_msg)))
         }
     }
 }
