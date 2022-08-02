@@ -19,55 +19,70 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.alvindizon.floatingcamera.R
+import com.alvindizon.floatingcamera.features.screenshot.viewmodel.ScreenshotContentViewModel
 import java.io.File
+
+
+@Composable
+fun ScreenshotScreen(viewModel: ScreenshotContentViewModel, onCloseButtonClick: () -> Unit) {
+    val context = LocalContext.current
+    Box(modifier = Modifier.fillMaxSize()) {
+        ScreenshotContent(
+            modifier = Modifier.align(Alignment.Center),
+            cacheFile = viewModel.cacheFile,
+            onShareButtonClick = { viewModel.onShareButtonClick(context) },
+            onEmailButtonClick = { viewModel.onEmailButtonClick(context) },
+            onCloseButtonClick = onCloseButtonClick
+        )
+    }
+}
 
 @Composable
 fun ScreenshotContent(
+    modifier: Modifier = Modifier,
     cacheFile: File?,
     onShareButtonClick: () -> Unit,
     onEmailButtonClick: () -> Unit,
     onCloseButtonClick: () -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-
-        Column(
-            modifier = Modifier.align(Alignment.Center),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        IconButton(onClick = onCloseButtonClick, modifier = Modifier.align(Alignment.Start)) {
+            Icon(imageVector = Icons.Filled.Close, contentDescription = null)
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        if (cacheFile != null) {
+            Image(
+                modifier = Modifier.weight(1f),
+                painter = rememberAsyncImagePainter(model = cacheFile),
+                contentDescription = null
+            )
+        } else {
+            Text(
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center,
+                text = stringResource(id = R.string.screenshot_error_msg),
+                style = MaterialTheme.typography.subtitle1
+            )
+        }
+        Row(
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onCloseButtonClick, modifier = Modifier.align(Alignment.Start)) {
-                Icon(imageVector = Icons.Filled.Close, contentDescription = null)
+            IconButton(onClick = onShareButtonClick, modifier = Modifier.weight(1f)) {
+                Image(imageVector = Icons.Filled.Share, contentDescription = null)
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            if (cacheFile != null) {
-                Image(
-                    modifier = Modifier.weight(1f),
-                    painter = rememberAsyncImagePainter(model = cacheFile),
-                    contentDescription = null
-                )
-            } else {
-                Text(
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center,
-                    text = stringResource(id = R.string.screenshot_error_msg),
-                    style = MaterialTheme.typography.subtitle1
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onShareButtonClick, modifier = Modifier.weight(1f)) {
-                    Image(imageVector = Icons.Filled.Share, contentDescription = null)
-                }
-                IconButton(onClick = onEmailButtonClick, modifier = Modifier.weight(1f)) {
-                    Image(imageVector = Icons.Filled.Mail, contentDescription = null)
-                }
+            IconButton(onClick = onEmailButtonClick, modifier = Modifier.weight(1f)) {
+                Image(imageVector = Icons.Filled.Mail, contentDescription = null)
             }
         }
     }

@@ -1,66 +1,29 @@
 package com.alvindizon.floatingcamera.features.screenshot.ui
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.core.content.FileProvider
-import com.alvindizon.floatingcamera.R
-import com.alvindizon.floatingcamera.features.screenshot.repo.ScreenshotRepository
+import com.alvindizon.floatingcamera.features.screenshot.viewmodel.ScreenshotContentViewModel
 import com.alvindizon.floatingcamera.ui.theme.FloatingCameraTheme
-import com.alvindizon.floatingcamera.utils.getFileProviderAuthority
-import org.koin.android.ext.android.inject
-import java.io.File
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class ScreenshotActivity : ComponentActivity() {
 
-    private val screenshotRepository: ScreenshotRepository by inject()
-
-    private var cacheFile: File? = null
+    private val viewModel: ScreenshotContentViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val filePath = screenshotRepository.getLatestScreenshotFilename()
-        cacheFile = filePath?.let { File(it) }
+        viewModel.onCreate()
         setContent {
             FloatingCameraTheme {
-                ScreenshotContent(
-                    cacheFile = cacheFile,
-                    onShareButtonClick = { share() },
-                    onEmailButtonClick = { email() },
-                    onCloseButtonClick = { finish() }
-                )
+                ScreenshotScreen(viewModel = viewModel, onCloseButtonClick = { finish() })
             }
         }
     }
 
     override fun onDestroy() {
-        screenshotRepository.release()
+        viewModel.onDestroy()
         super.onDestroy()
-    }
-
-    private fun share() {
-        cacheFile?.let {
-            val uri = FileProvider.getUriForFile(this, getFileProviderAuthority(this), it)
-            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                setDataAndType(uri, "image/png")
-                putExtra(Intent.EXTRA_STREAM, uri)
-            }
-            startActivity(Intent.createChooser(shareIntent, getString(R.string.app_name)))
-        }
-    }
-
-    private fun email() {
-        cacheFile?.let {
-            val attachment = FileProvider.getUriForFile(this, getFileProviderAuthority(this), it)
-            val emailIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.send_email_msg))
-                putExtra(Intent.EXTRA_STREAM, attachment)
-            }
-            startActivity(Intent.createChooser(emailIntent, getString(R.string.send_email_msg)))
-        }
     }
 }
