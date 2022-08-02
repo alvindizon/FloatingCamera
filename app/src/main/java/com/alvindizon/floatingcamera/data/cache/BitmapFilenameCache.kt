@@ -5,13 +5,16 @@ import android.graphics.Bitmap
 import com.alvindizon.floatingcamera.utils.getBitmapCachePath
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Class for saving bitmaps and for storing their filenames.
  */
 interface BitmapFilenameCache {
     fun getLatestScreenshotFilename(): String?
-    fun saveBitmap(bitmap: Bitmap)
+    suspend fun saveBitmap(bitmap: Bitmap)
     fun clearCache()
 }
 
@@ -25,7 +28,7 @@ class BitmapFilenameCacheImpl(context: Context) : BitmapFilenameCache {
 
     override fun getLatestScreenshotFilename() = fileNameList.getOrNull(fileNameList.size - 1)
 
-    override fun saveBitmap(bitmap: Bitmap) {
+    override suspend fun saveBitmap(bitmap: Bitmap) = suspendCoroutine { cont ->
         try {
             val key = System.currentTimeMillis().toString(16) + ".bmp"
             val fileFolder = File(cacheDirPath)
@@ -37,8 +40,10 @@ class BitmapFilenameCacheImpl(context: Context) : BitmapFilenameCache {
             fileNameList.add(cacheDirPath + File.separator + key)
             fos.flush()
             fos.close()
+            cont.resume(Unit)
         } catch (e: Throwable) {
             e.printStackTrace()
+            cont.resumeWithException(e)
         }
     }
 

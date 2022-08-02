@@ -17,7 +17,9 @@ import com.alvindizon.floatingcamera.features.screenshot.repo.ScreenshotReposito
 import com.alvindizon.floatingcamera.features.screenshot.ui.ScreenshotActivity
 import com.alvindizon.floatingcamera.utils.getSafeParcelable
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 
@@ -69,13 +71,22 @@ class FloatingCameraService : Service() {
     }
 
     private fun capture() {
-        val bitmap = screenshotRepository.capture()
-        runBlocking(Dispatchers.IO) {
-            bitmap?.let { screenshotRepository.saveBitmap(it) }
+        GlobalScope.launch(Dispatchers.Main) {
+            floatingCamera.toggleVisibility(false)
+            // add a delay so that floating icon is invisible before screenshot
+            delay(100L)
+            val bitmap = screenshotRepository.capture()
+            val job = launch  {
+                bitmap?.let { screenshotRepository.saveBitmap(it) }
+            }
+            // block until saving is complete
+            job.join()
+            // make floating icon visible again after bitmap is saved
+            floatingCamera.toggleVisibility(true)
+            val intent = Intent(this@FloatingCameraService, ScreenshotActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
         }
-        val intent = Intent(this, ScreenshotActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
     }
 
     private fun createNotification(): Notification {

@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModelStore
@@ -78,6 +79,10 @@ class FloatingCamera(context: Context) {
 
     fun removeView() {
         windowManager.removeView(view)
+    }
+
+    fun toggleVisibility(isVisible: Boolean) {
+        view.isVisible = isVisible
     }
 }
 
