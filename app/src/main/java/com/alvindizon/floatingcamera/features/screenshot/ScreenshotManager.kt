@@ -44,6 +44,7 @@ class ScreenshotManagerImpl(
 
     override fun initialize(mediaData: Intent) {
         this.mediaData = mediaData
+        // a mediaprojection
         mediaProjection = mediaProjectionManager.getMediaProjection(Activity.RESULT_OK, mediaData)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val displayContext =

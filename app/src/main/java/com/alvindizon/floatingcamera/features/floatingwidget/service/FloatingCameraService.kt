@@ -16,8 +16,9 @@ import com.alvindizon.floatingcamera.features.floatingwidget.ui.FloatingCamera
 import com.alvindizon.floatingcamera.features.screenshot.repo.ScreenshotRepository
 import com.alvindizon.floatingcamera.features.screenshot.ui.ScreenshotActivity
 import com.alvindizon.floatingcamera.utils.getSafeParcelable
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -33,9 +34,18 @@ class FloatingCameraService : Service() {
 
     private val screenshotRepository: ScreenshotRepository by inject()
 
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.Main + job)
+
     override fun onCreate() {
         super.onCreate()
         val notification = createNotification()
+        // we need to start the foreground service before creating mediaprojection
+        // Apps targeting SDK version Build.VERSION_CODES.Q or
+        // later must set the foregroundServiceType attribute to
+        // mediaProjection in the <service> element of the app's manifest file;
+        // mediaProjection is equivalent to FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION.
+        // ref: https://developer.android.com/reference/android/media/projection/MediaProjectionManager#getMediaProjection(int,%20android.content.Intent)
         startForeground(FLOATING_CAMERA_NOTIF_ID, notification)
         notificationManager.notify(FLOATING_CAMERA_NOTIF_ID, notification)
         showFloatingCamera()
@@ -62,6 +72,7 @@ class FloatingCameraService : Service() {
     override fun onBind(p0: Intent?): IBinder? = null
 
     override fun onDestroy() {
+        job.cancel()
         screenshotRepository.release()
         super.onDestroy()
     }
@@ -71,12 +82,14 @@ class FloatingCameraService : Service() {
     }
 
     private fun capture() {
-        GlobalScope.launch(Dispatchers.Main) {
+        // we can get the returned job and release it properly in onDestroy or when floating camera
+        // is removed, maybe we can use SupervisorJob
+        scope.launch {
             floatingCamera.toggleVisibility(false)
             // add a delay so that floating icon is invisible before screenshot
             delay(100L)
             val bitmap = screenshotRepository.capture()
-            val job = launch  {
+            val job = launch(Dispatchers.IO)  {
                 bitmap?.let { screenshotRepository.saveBitmap(it) }
             }
             // block until saving is complete
@@ -84,6 +97,7 @@ class FloatingCameraService : Service() {
             // make floating icon visible again after bitmap is saved
             floatingCamera.toggleVisibility(true)
             val intent = Intent(this@FloatingCameraService, ScreenshotActivity::class.java)
+            // these flags make sure that exiting the ScreenshotActivity will not take you back to MainActivity
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
         }
